@@ -16,27 +16,26 @@
 #          [ONLY the ADMIN can decide to act on this scenario]
 
 #-----------------------------------------------------------------------------------------------------
-# Written on 31/10/2020 by Rachit Dhar (ADMIN)
+# Written on 31/10/2020 by Rachit Dhar
 #*****************************************************************************************************
 
 import os
 import time
 import getpass
 
+#Manual Reboot Authorization Code
+CODE = "1234" #Keep a STRONG security code here!
+
 #security protocol
 def securityCheck():
-    myname = input("Enter your name: ")
-    if myname == "Rachit Dhar":
-        pword = getpass.getpass()
-        if pword == "1234": #Please keep a better password over here!
-            time.sleep(2)
-            print("\nHello Admin!")
-            time.sleep(1)
-            print("Let's clean up the mess.\n")
-            time.sleep(1)
-            return True
-        else:
-            return False
+    usercode = getpass.getpass()
+    if usercode == CODE:
+        time.sleep(2)
+        print("\nHello Admin!")
+        time.sleep(1)
+        print("Let's clean up the mess.\n")
+        time.sleep(1)
+        return True
     else:
         return False
 
@@ -91,7 +90,10 @@ def systemReboot(cursor, db, scenario):
             db_existed = True
         except:
             db_existed = False
-
+        
+        #obtain password for the renewed file system
+        new_pword = getpass.getpass()
+        
         # create a new fresh rdfs database with the default tables
         queries = ['create database rdfs',\
                     'use rdfs',\
@@ -103,10 +105,8 @@ def systemReboot(cursor, db, scenario):
                     'create table pathspass(Password varchar(30))',\
                     'create table help(Commands varchar(30), Description varchar(200))',\
                     'insert into memaddr values("0x0", "")',\
-                    'insert into pathspass values("1234")'
+                    'insert into pathspass values("'+new_pword+'")'
                     ]
-                    
-                    #Please keep a better password here!
 
         for query in queries:
             cursor.execute(query)
@@ -164,4 +164,4 @@ def systemReboot(cursor, db, scenario):
         print("="*60)
 
     else:
-        print("Sorry, only ADMIN is granted permission to reboot.")
+        print("Wrong Authorization code. Permission NOT granted!")
